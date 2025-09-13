@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Invoice{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header bg-dark text-white">🎟 Seat Booking Receipt</div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-8">
+        <p><b>Name:</b> {{ user.name }}</p>
+        <p><b>Seat:</b> {{ seat.id }} ({{ seat.type }})</p>
+        <p><b>Amount Paid:</b> ₹{{ booking.amount }}</p>
+        <p><b>Valid Till:</b> {{ booking.valid_till.strftime("%Y-%m-%d") }}</p>
+        <p><b>Booking Date:</b> {{ booking.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
+      </div>
+      <div class="col-md-2 text-center">
+        {% if booking.photo %}
+          <img src="{{ url_for('static', filename='uploads/' ~ booking.photo) }}"
+               alt="User Photo" class="img-thumbnail" width="120">
+          <p class="mt-2"><small>Passport Photo</small></p>
+        {% else %}
+          <p class="text-muted">No Photo Uploaded</p>
+        {% endif %}
+      </div>
+      <div class="col-md-2 text-center">
+        <img src="{{ url_for('static', filename='qrcodes/' ~ booking.id ~ '.png') }}"
+             alt="QR Code" class="img-thumbnail" width="120">
+        <p class="mt-2"><small>QR Code</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+<button class="btn btn-primary mt-3" onclick="window.print()">🖨 Print</button>
+{% endblock %}

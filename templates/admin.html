@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block head %}
+<style>
+  body { background-color: #f8f9fa; font-family: Arial, sans-serif; }
+  .main-container { max-width: 1200px; margin: auto; }
+  .hall-container { display: flex; justify-content: space-between; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+  .hall { flex: 1; background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); min-width: 300px; }
+  .hall h4 { text-align: center; margin-bottom: 20px; font-weight: bold; letter-spacing: 1px; }
+
+  .row-layout { display: flex; align-items: center; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
+  .seat-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; justify-items: center; }
+
+  .seat-icon {
+    width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; font-size: 14px; font-weight: bold; color: white; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  }
+  .seat-icon:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+  .seat-icon.available { background: #28a745; }
+  .seat-icon.booked { background: #dc3545; }
+  .seat-icon.blocked { background: #6c757d; }
+  .seat-icon.unreserved { background: #ffc107; color: black; }
+  .seat-icon.deluxe { background: #007bff; }
+  .seat-icon.premium { background: #28a745; }
+  .seat-icon.hr { background: #fd7e14; }
+
+  .passage { width: 40px; }
+  .wall { font-size: 24px; color: #343a40; margin-left: 10px; margin-right: 10px; width: 30px; text-align: center; }
+  .facing { font-size: 20px; font-weight: bold; margin: 0 10px; color: #555; }
+  .row-label { font-weight: bold; color: #555; width: 60px; text-align: right; }
+
+  .hidden { display: none; }
+  .badge { font-size: 0.8rem; }
+  .modal-dialog { max-width: 600px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-4 text-center">Admin Dashboard & Seat Map</h2>
+<p class="text-center text-muted">Manage seat bookings and view live status for each location.</p>
+
+<div class="row mb-4 g-3">
+  <div class="col-md-3"><div class="card p-3 text-center bg-primary text-white">Total Seats: **{{ total }}**</div></div>
+  <div class="col-md-3"><div class="card p-3 text-center bg-secondary text-white">Blocked: **{{ blocked }}**</div></div>
+  <div class="col-md-3"><div class="card p-3 text-center bg-danger text-white">Booked: **{{ booked }}**</div></div>
+  <div class="col-md-3"><div class="card p-3 text-center bg-success text-white">Available: **{{ available }}**</div></div>
+</div>
+
+<div class="mb-5 d-flex justify-content-center">
+  <div class="form-group w-50">
+    <label for="locationSelect" class="form-label fw-bold">Select Location:</label>
+    <select class="form-select" id="locationSelect" onchange="showLocationLayout()">
+      <option value="">-- Choose a Location --</option>
+      <option value="pune">Pune Center</option>
+      <option value="mumbai">Mumbai Center</option>
+    </select>
+  </div>
+</div>
+
+<div id="puneLayout" class="main-container hidden">
+  <div class="hall-container">
+    <div class="hall">
+      <h4 class="text-primary">Pune Hall 1 (Seats 1-100)</h4>
+      <div class="row-layout"><span class="facing">◀</span><div class="seat-row" id="pune-hall1-a"></div><div class="wall">🧱</div><span class="row-label">Row A</span></div>
+      <div class="row-layout"><span class="facing">▶</span><div class="seat-row" id="pune-hall1-b"></div><div class="passage"></div><div class="seat-row" id="pune-hall1-c"></div><div class="wall">🧱</div><span class="row-label">Row B</span></div>
+      <div class="row-layout"><span class="me-2">Row D</span><div class="seat-row" id="pune-hall1-d"></div><span class="facing">▶</span><div class="wall">🧱</div><span class="row-label">Row D</span></div>
+    </div>
+    <div class="hall">
+      <h4 class="text-success">Pune Hall 2 (Seats 101-200)</h4>
+      <div class="row-layout"><span class="facing">◀</span><div class="seat-row" id="pune-hall2-a"></div><div class="wall">🧱</div><span class="row-label">Row A</span></div>
+      <div class="row-layout"><span class="facing">▶</span><div class="seat-row" id="pune-hall2-b"></div><div class="passage"></div><div class="seat-row" id="pune-hall2-c"></div><div class="wall">🧱</div><span class="row-label">Row B</span></div>
+      <div class="row-layout"><span class="me-2">Row D</span><div class="seat-row" id="pune-hall2-d"></div><span class="facing">▶</span><div class="wall">🧱</div><span class="row-label">Row D</span></div>
+    </div>
+  </div>
+  <div class="hall-container">
+    <div class="hall mx-auto" style="min-width: 600px;">
+      <h4 class="text-info">Pune Hall 3 (Seats 201-300)</h4>
+      <div class="row-layout"><span class="facing">◀</span><div class="seat-row" id="pune-hall3-a"></div><div class="wall">🧱</div><span class="row-label">Row A</span></div>
+      <div class="row-layout"><span class="facing">▶</span><div class="seat-row" id="pune-hall3-b"></div><div class="passage"></div><div class="seat-row" id="pune-hall3-c"></div><div class="wall">🧱</div><span class="row-label">Row B</span></div>
+      <div class="row-layout"><span class="me-2">Row D</span><div class="seat-row" id="pune-hall3-d"></div><span class="facing">▶</span><div class="wall">🧱</div><span class="row-label">Row D</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="mumbaiLayout" class="main-container hidden">
+  <div class="hall-container">
+    <div class="hall">
+      <h4 class="text-primary">Mumbai Hall 1 (Seats 1-100)</h4>
+      <div class="row-layout"><span class="facing">◀</span><div class="seat-row" id="mumbai-hall1-a"></div><div class="wall">🧱</div><span class="row-label">Row A</span></div>
+      <div class="row-layout"><span class="facing">▶</span><div class="seat-row" id="mumbai-hall1-b"></div><div class="passage"></div><div class="seat-row" id="mumbai-hall1-c"></div><div class="wall">🧱</div><span class="row-label">Row B</span></div>
+    <div class="row-layout"><span class="me-2">Row D</span><div class="seat-row" id="mumbai-hall1-d"></div><span class="facing">▶</span><div class="wall">🧱</div><span class="row-label">Row D</span></div>
+    </div>
+    <div class="hall">
+      <h4 class="text-success">Mumbai Hall 2 (Seats 101-200)</h4>
+      <div class="row-layout"><span class="facing">◀</span><div class="seat-row" id="mumbai-hall2-a"></div><div class="wall">🧱</div><span class="row-label">Row A</span></div>
+      <div class="row-layout"><span class="facing">▶</span><div class="seat-row" id="mumbai-hall2-b"></div><div class="passage"></div><div class="seat-row" id="mumbai-hall2-c"></div><div class="wall">🧱</div><span class="row-label">Row B</span></div>
+      <div class="row-layout"><span class="me-2">Row D</span><div class="seat-row" id="mumbai-hall2-d"></div><span class="facing">▶</span><div class="wall">🧱</div><span class="row-label">Row D</span></div>
+    </div>
+  </div>
+  <div class="hall-container">
+    <div class="hall mx-auto" style="min-width: 600px;">
+      <h4 class="text-info">Mumbai Hall 3 (Seats 201-300)</h4>
+      <div class="row-layout"><span class="facing">◀</span><div class="seat-row" id="mumbai-hall3-a"></div><div class="wall">🧱</div><span class="row-label">Row A</span></div>
+      <div class="row-layout"><span class="facing">▶</span><div class="seat-row" id="mumbai-hall3-b"></div><div class="passage"></div><div class="seat-row" id="mumbai-hall3-c"></div><div class="wall">🧱</div><span class="row-label">Row B</span></div>
+      <div class="row-layout"><span class="me-2">Row D</span><div class="seat-row" id="mumbai-hall3-d"></div><span class="facing">▶</span><div class="wall">🧱</div><span class="row-label">Row D</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="seatInfoModal" tabindex="-1" aria-labelledby="seatInfoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('admin_seats_action') }}" id="seatActionForm">
+      <input type="hidden" name="seat_id" id="modalSeatId">
+      <input type="hidden" name="action" id="modalActionType">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="seatInfoLabel">Seat Info & Actions</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Seat</label>
+              <input type="text" id="modalSeatName" class="form-control" disabled>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Price</label>
+              <input type="number" name="price" id="modalSeatPrice" class="form-control" min="0">
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Student Name</label>
+            <input type="text" name="student_name" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Mobile</label>
+            <input type="text" name="mobile" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Payment Type</label>
+            <select name="payment_type" class="form-select">
+              <option value="Cash">Cash</option>
+              <option value="Online">Online</option>
+              <option value="Card">Card</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Amount Paid</label>
+            <input type="number" name="amount_paid" class="form-control" value="0" min="0">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Valid Till</label>
+            <input type="date" name="valid_till" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Notes</label>
+            <textarea name="notes" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success" id="bookSeatBtn">Book Seat</button>
+          <button type="submit" class="btn btn-warning" id="unbookSeatBtn" style="display:none;">Unbook Seat</button>
+          <button type="submit" class="btn btn-danger" id="blockSeatBtn" style="display:none;">Block Seat</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<h4 class="mt-5">Live Seat Monitoring</h4>
+<div class="table-responsive">
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Seat</th>
+        <th>Status</th>
+        <th>Price</th>
+        <th>Student Name</th>
+        <th>Mobile</th>
+        <th>Payment</th>
+        <th>Amount</th>
+        <th>Booking Time</th>
+        <th>Valid Till</th>
+        <th>Reminder</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in seats %}
+      {% set booking = bookings|selectattr("seat_id","equalto",s.id)|first %}
+      <tr>
+        <td>{{ s.row }}{{ s.number }}</td>
+        <td>
+          {% if s.is_booked %}
+            <span class="badge bg-danger">Booked</span>
+          {% elif s.is_blocked %}
+            <span class="badge bg-secondary">Blocked</span>
+          {% else %}
+            <span class="badge bg-success">Available</span>
+          {% endif %}
+        </td>
+        <td>{{ s.price }}</td>
+        <td>{{ booking.student_name if booking else "" }}</td>
+        <td>{{ booking.mobile if booking else "" }}</td>
+        <td>{{ booking.payment_type if booking else "" }}</td>
+        <td>{{ booking.amount_paid if booking else "" }}</td>
+        <td>{{ booking.time if booking else "" }}</td>
+        <td>{{ booking.valid_till if booking else "" }}</td>
+        <td>
+          {% if booking and booking.mobile %}
+          <button class="btn btn-success btn-sm sendWhatsappBtn" data-mobile="{{ booking.mobile }}" data-name="{{ booking.student_name }}">
+            <i class="fab fa-whatsapp"></i> Send Reminder
+          </button>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+<script>
+  const allSeats = {{ seats | tojson }};
+  const allBookings = {{ bookings | tojson }};
+
+  function getSeatInfo(seatId) {
+    return allSeats.find(s => s.id == seatId);
+  }
+
+  function getBookingInfo(seatId) {
+    return allBookings.find(b => b.seat_id == seatId);
+  }
+
+  function generateSeats(containerId, hallName, rowLabel, start, count) {
+    let container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      let seatNum = start + i;
+      let seatData = getSeatInfo(seatNum);
+      if (!seatData) continue;
+
+      let seat = document.createElement("div");
+      seat.className = "seat-icon " + (seatData.is_booked ? "booked" : seatData.is_blocked ? "blocked" : "available");
+      seat.innerText = seatData.row + seatData.number;
+      seat.title = `Seat ${hallName}-${rowLabel}${i+1}\nPrice: ₹${seatData.price}`;
+
+      seat.setAttribute("data-bs-toggle", "modal");
+      seat.setAttribute("data-bs-target", "#seatInfoModal");
+      seat.setAttribute("data-seatid", seatData.id);
+      seat.setAttribute("data-seatname", seatData.row + seatData.number);
+      seat.setAttribute("data-price", seatData.price);
+      seat.setAttribute("data-isbooked", seatData.is_booked ? '1' : '0');
+      seat.setAttribute("data-isblocked", seatData.is_blocked ? '1' : '0');
+
+      container.appendChild(seat);
+    }
+  }
+
+  function showLocationLayout() {
+    const location = document.getElementById('locationSelect').value;
+    document.getElementById('puneLayout').classList.add('hidden');
+    document.getElementById('mumbaiLayout').classList.add('hidden');
+    if (location === 'pune') {
+      document.getElementById('puneLayout').classList.remove('hidden');
+      generateSeats("pune-hall1-a", "P-H1", "A", 1, 20);
+      generateSeats("pune-hall1-b", "P-H1", "B", 21, 20);
+      generateSeats("pune-hall1-c", "P-H1", "C", 41, 20);
+      generateSeats("pune-hall1-d", "P-H1", "D", 61, 20);
+      generateSeats("pune-hall2-a", "P-H2", "A", 81, 20);
+      generateSeats("pune-hall2-b", "P-H2", "B", 101, 20);
+      generateSeats("pune-hall2-c", "P-H2", "C", 121, 20);
+      generateSeats("pune-hall2-d", "P-H2", "D", 141, 20);
+      generateSeats("pune-hall3-a", "P-H3", "A", 161, 20);
+      generateSeats("pune-hall3-b", "P-H3", "B", 181, 20);
+      generateSeats("pune-hall3-c", "P-H3", "C", 201, 20);
+      generateSeats("pune-hall3-d", "P-H3", "D", 221, 20);
+    } else if (location === 'mumbai') {
+      document.getElementById('mumbaiLayout').classList.remove('hidden');
+      generateSeats("mumbai-hall1-a", "M-H1", "A", 1, 20);
+      generateSeats("mumbai-hall1-b", "M-H1", "B", 21, 20);
+      generateSeats("mumbai-hall1-c", "M-H1", "C", 41, 20);
+      generateSeats("mumbai-hall1-d", "M-H1", "D", 61, 20);
+      generateSeats("mumbai-hall2-a", "M-H2", "A", 81, 20);
+      generateSeats("mumbai-hall2-b", "M-H2", "B", 101, 20);
+      generateSeats("mumbai-hall2-c", "M-H2", "C", 121, 20);
+      generateSeats("mumbai-hall2-d", "M-H2", "D", 141, 20);
+      generateSeats("mumbai-hall3-a", "M-H3", "A", 161, 20);
+      generateSeats("mumbai-hall3-b", "M-H3", "B", 181, 20);
+      generateSeats("mumbai-hall3-c", "M-H3", "C", 201, 20);
+      generateSeats("mumbai-hall3-d", "M-H3", "D", 221, 20);
+    }
+  }
+
+  var modal = document.getElementById('seatInfoModal');
+  modal.addEventListener('show.bs.modal', function(event) {
+    var button = event.relatedTarget;
+    var seatId = button.getAttribute('data-seatid');
+    var seatData = getSeatInfo(seatId);
+    var bookingData = getBookingInfo(seatId);
+
+    document.getElementById('modalSeatId').value = seatId;
+    document.getElementById('modalSeatName').value = seatData.row + seatData.number;
+    document.getElementById('modalSeatPrice').value = seatData.price;
+
+    var inputs = modal.querySelectorAll('input[name], select[name], textarea[name]');
+    var bookBtn = document.getElementById('bookSeatBtn');
+    var unbookBtn = document.getElementById('unbookSeatBtn');
+    var blockBtn = document.getElementById('blockSeatBtn');
+
+    unbookBtn.style.display = 'none';
+    blockBtn.style.display = 'none';
+    bookBtn.style.display = 'block';
+
+    inputs.forEach(i => i.disabled = false);
+    document.querySelector('input[name="student_name"]').required = true;
+    document.querySelector('input[name="amount_paid"]').required = true;
+
+    if (seatData.is_booked) {
+      document.getElementById('modalActionType').value = 'unbook';
+      bookBtn.style.display = 'none';
+      unbookBtn.style.display = 'block';
+      inputs.forEach(i => i.disabled = true);
+      document.getElementById('modalSeatId').disabled = false;
+      document.getElementById('modalActionType').disabled = false;
+      document.getElementById('modalSeatPrice').disabled = false; // Allow price edit
+      if (bookingData) {
+        document.querySelector('input[name="student_name"]').value = bookingData.student_name;
+        document.querySelector('input[name="mobile"]').value = bookingData.mobile;
+        document.querySelector('select[name="payment_type"]').value = bookingData.payment_type;
+        document.querySelector('input[name="amount_paid"]').value = bookingData.amount_paid;
+        document.querySelector('input[name="valid_till"]').value = bookingData.valid_till;
+        document.querySelector('textarea[name="notes"]').value = bookingData.notes;
+      }
+    } else if (seatData.is_blocked) {
+      document.getElementById('modalActionType').value = 'unblock';
+      bookBtn.style.display = 'none';
+      blockBtn.style.display = 'block';
+      inputs.forEach(i => i.disabled = true);
+      document.getElementById('modalSeatId').disabled = false;
+      document.getElementById('modalActionType').disabled = false;
+      document.getElementById('modalSeatPrice').disabled = false; // Allow price edit
+    } else {
+      document.getElementById('modalActionType').value = 'book';
+      document.querySelector('input[name="student_name"]').value = '';
+      document.querySelector('input[name="mobile"]').value = '';
+      document.querySelector('input[name="amount_paid"]').value = 0;
+      document.querySelector('input[name="valid_till"]').value = '';
+      document.querySelector('textarea[name="notes"]').value = '';
+    }
+  });
+
+  document.querySelectorAll('.sendWhatsappBtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      var mobile = btn.getAttribute('data-mobile');
+      var name = btn.getAttribute('data-name');
+      var text = `Hi ${name}, this is a reminder for your seat booking. Please make sure to renew it if you wish to continue. Thank you!`;
+      window.open(`https://wa.me/${mobile}?text=${encodeURIComponent(text)}`, '_blank');
+    });
+  });
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% endblock %}

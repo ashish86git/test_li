@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Home - Library Seats{% endblock %}
+{% block content %}
+<div class="text-center mt-5">
+  <h1>Welcome to Library Seat Booking</h1>
+  <p class="lead">Reserve your seat quickly and efficiently.</p>
+  {% if not current_user %}
+    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg me-2">Login</a>
+    <a href="{{ url_for('register') }}" class="btn btn-success btn-lg">Register</a>
+  {% else %}
+    <a href="{{ url_for('seats') }}" class="btn btn-primary btn-lg">View Seats</a>
+  {% endif %}
+</div>
+{% endblock %}
