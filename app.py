@@ -425,6 +425,78 @@ def admin_update_seat():
         return redirect(url_for("admin_dashboard"))
     return "Seat not found", 404
 
+
+@app.route("/dashboard")
+def dashboard():
+    if not session.get("is_admin"):
+        return redirect(url_for("login"))
+
+    today = datetime.today().date()
+
+    # ✅ Today Booked Seats
+    today_booked = Booking.query.filter(
+        db.func.date(Booking.created_at) == today
+    ).count()
+
+    # ✅ Today Validity Ending
+    today_ending = Booking.query.filter(
+        db.func.date(Booking.valid_till) == today
+    ).count()
+
+    # ✅ Last 7 Days Payments
+    last7days_payment = db.session.query(
+        db.func.sum(Booking.amount)
+    ).filter(
+        Booking.created_at >= datetime.today() - timedelta(days=7)
+    ).scalar() or 0
+
+    # ✅ Total Payment (All Time)
+    total_payment = db.session.query(
+        db.func.sum(Booking.amount)
+    ).scalar() or 0
+
+    # ✅ Seat Counts
+    total_booked = Seat.query.filter_by(status="booked").count()
+    total_available = Seat.query.filter_by(status="available").count()
+    total_blocked = Seat.query.filter_by(status="blocked").count()
+    total_seats = Seat.query.count()
+
+    # ✅ Payments per day & Seat Bookings per day
+    payments_by_day = []
+    bookings_by_day = []
+    labels = []
+    for i in range(6, -1, -1):  # last 7 days
+        day = today - timedelta(days=i)
+        labels.append(day.strftime("%d %b"))
+
+        # Payment
+        amount = db.session.query(
+            db.func.sum(Booking.amount)
+        ).filter(db.func.date(Booking.created_at) == day).scalar() or 0
+        payments_by_day.append(amount)
+
+        # Seat bookings
+        booked = Booking.query.filter(
+            db.func.date(Booking.created_at) == day
+        ).count()
+        bookings_by_day.append(booked)
+
+    return render_template("dashboard.html",
+        today_booked=today_booked,
+        today_ending=today_ending,
+        last7days_payment=last7days_payment,
+        total_payment=total_payment,
+        total_booked=total_booked,
+        total_available=total_available,
+        total_blocked=total_blocked,
+        total_seats=total_seats,
+        labels=labels,
+        payments_by_day=payments_by_day,
+        bookings_by_day=bookings_by_day
+    )
+
+
+
 # ---------- Run ----------
 if __name__ == "__main__":
     with app.app_context():
