@@ -34,6 +34,10 @@
     .btn-primary:hover {
       background: linear-gradient(135deg, #1565c0, #1e88e5);
     }
+    .register-link {
+      text-align: center;
+      margin-top: 15px;
+    }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -58,11 +62,20 @@
         <input type="password" name="password" class="form-control shadow-sm" required>
       </div>
       <div class="d-grid">
-        <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-box-arrow-in-right"></i> Login</button>
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="bi bi-box-arrow-in-right"></i> Login
+        </button>
       </div>
     </form>
-  </div>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Register Link -->
+    <div class="register-link">
+      <p>Don't have an account?
+        <a href="{{ url_for('register') }}" class="text-decoration-none fw-bold text-primary">
+          <i class="bi bi-person-plus"></i> Register
+        </a>
+      </p>
+    </div>
+  </div>
 </body>
 </html>
