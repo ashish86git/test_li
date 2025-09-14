@@ -79,13 +79,26 @@
     <a class="navbar-brand" href="#">📊 Admin Dashboard</a>
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" href="#seats">💺 Seats</a></li>
         <li class="nav-item"><a class="nav-link" href="#bookings">📝 Bookings</a></li>
         <li class="nav-item"><a class="nav-link" href="#users">👥 Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="#help">❓ Help</a></li>
         <li class="nav-item"><a href="{{ url_for('logout') }}" class="btn btn-sm btn-danger ms-2">Logout</a></li>
       </ul>
     </div>
   </nav>
+
+  <!-- Help Section -->
+  <div id="help" class="container mt-3">
+    <div class="alert alert-info shadow-sm rounded">
+      <h5 class="mb-2">❓ Need Help?</h5>
+      <p class="mb-0">
+        If you face any issue while using the dashboard, please contact admin support at
+        <a href="mailto:support@library.com">support@library.com</a>.
+      </p>
+    </div>
+  </div>
 
   <div class="container py-4">
 
@@ -237,6 +250,33 @@
           {% endfor %}
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title">❓ Help & Support</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Welcome to the <b>Admin Dashboard</b>.<br>
+            👉 Use the navigation bar to manage <b>Seats</b>, <b>Bookings</b>, and <b>Users</b>.<br>
+            👉 Right-click on a seat for quick actions (block/unblock/unbook).<br>
+            👉 You can filter data using the filters provided above tables.
+          </p>
+          <hr>
+          <p class="mb-1">For any issue or queries, contact:</p>
+          <p class="fw-bold mb-0">📧 support@library.com</p>
+          <p class="fw-bold">📞 +91 98765 43210</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>
