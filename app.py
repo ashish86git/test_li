@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, Response
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 import uuid, random
@@ -80,6 +80,7 @@ class Booking(db.Model):
     email = db.Column(db.String(150))
     aadhaar = db.Column(db.String(300))   # ONLY filename stored
     photo = db.Column(db.String(300))     # ONLY filename stored
+    photo_data = db.Column(db.LargeBinary)
 
 
 # -------------------- Constants --------------------
@@ -273,15 +274,9 @@ def book():
     if not photo_file or not allowed_file(photo_file.filename):
         return jsonify({"success": False, "message": "Invalid Photo file"})
 
-    # Save files to static/uploads
+    # Filenames सिर्फ record के लिए (optional)
     aadhaar_filename = secure_filename(f"AADHAAR_{uuid.uuid4()}_{aadhaar_file.filename}")
     photo_filename = secure_filename(f"PHOTO_{uuid.uuid4()}_{photo_file.filename}")
-
-    aadhaar_save_path = os.path.join(app.config["UPLOAD_FOLDER"], aadhaar_filename)
-    photo_save_path = os.path.join(app.config["UPLOAD_FOLDER"], photo_filename)
-
-    aadhaar_file.save(aadhaar_save_path)
-    photo_file.save(photo_save_path)
 
     seat = Seat.query.get(seat_id)
     if not seat:
@@ -306,13 +301,22 @@ def book():
         contact=contact,
         email=email,
         aadhaar=aadhaar_filename,
-        photo=photo_filename
+        photo=photo_filename,
+        photo_data=photo_file.read()   # ✅ binary DB में save हो रही है
     )
     db.session.add(booking)
     db.session.commit()
 
     return jsonify({"success": True, "booking_id": booking.id})
 
+
+@app.route("/photo/<bid>")
+def photo(bid):
+    booking = Booking.query.get(bid)
+    if not booking or not booking.photo_data:
+        return "Not Found", 404
+    # फिलहाल मान लेते हैं कि सब JPG/PNG है
+    return Response(booking.photo_data, mimetype="image/jpeg")
 
 
 @app.route("/invoice/<bid>")
@@ -357,7 +361,7 @@ def admin_dashboard():
         q = q.filter_by(type=filter_type)
     if filter_location:
         q = q.filter_by(location=filter_location)
-    # ✅ Always keep seats ordered by number
+
     filtered_seats = q.order_by(Seat.number.asc()).all()
 
     return render_template(
@@ -371,6 +375,7 @@ def admin_dashboard():
         filter_type=filter_type,
         filter_location=filter_location
     )
+
 
 @app.route("/admin_action", methods=["POST"])
 def admin_action():
