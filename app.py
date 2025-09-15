@@ -25,6 +25,7 @@ db = SQLAlchemy(app)
 
 # Upload folder config
 UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads")
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB limit
@@ -272,7 +273,7 @@ def book():
     if not photo_file or not allowed_file(photo_file.filename):
         return jsonify({"success": False, "message": "Invalid Photo file"})
 
-    # Save files
+    # Save files to static/uploads
     aadhaar_filename = secure_filename(f"AADHAAR_{uuid.uuid4()}_{aadhaar_file.filename}")
     photo_filename = secure_filename(f"PHOTO_{uuid.uuid4()}_{photo_file.filename}")
 
@@ -311,6 +312,7 @@ def book():
     db.session.commit()
 
     return jsonify({"success": True, "booking_id": booking.id})
+
 
 
 @app.route("/invoice/<bid>")
