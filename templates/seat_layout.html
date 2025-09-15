@@ -1,115 +1,144 @@
-<!-- Font Awesome CDN -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
+  .bus-container {
+    background: linear-gradient(135deg, #fdfbfb, #ebedee);
+    padding: 35px;
+    border-radius: 22px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+    width: fit-content;
+    margin: 30px auto;
+  }
+
+  .bus-header {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: #2c3e50;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  }
+
+  .bus-layout {
+    display: flex;
+    justify-content: center;
+    gap: 70px; /* passage ka gap */
+  }
+
+  .seat-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 seats ek row me */
+    gap: 22px 38px;
+  }
+
   .seat {
-    width: 65px;
-    height: 75px;
-    border-radius: 10px;
+    width: 90px;
+    height: 100px;
+    border-radius: 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
-    font-weight: bold;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     text-align: center;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(145deg, #ffffff, #f3f5f7);
+    border: 2px solid #dee2e6;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
   }
+
   .seat:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    transform: translateY(-5px) scale(1.05);
+    border-color: #3498db;
+    box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
   }
 
-  .seat i {
-    font-size: 22px;
-    margin-bottom: 4px;
+  .seat .icon {
+    font-size: 36px;
+    margin-bottom: 6px;
   }
 
+  /* Seat Status Colors */
   .available {
-    background: #28a745;
+    background: linear-gradient(145deg, #1abc9c, #16a085);
     color: #fff;
   }
   .booked {
-    background: #dc3545;
+    background: linear-gradient(145deg, #e74c3c, #c0392b);
     color: #fff;
     cursor: not-allowed;
   }
   .blocked {
-    background: #343a40;
+    background: linear-gradient(145deg, #95a5a6, #7f8c8d);
     color: #fff;
     cursor: not-allowed;
   }
+
+  /* Passage */
   .passage {
-    width: 80px;
+    width: 85px;
+  }
+
+  /* Back seat (last row full width) */
+  .back-seat-row {
+    margin-top: 38px;
+    display: flex;
+    justify-content: center;
+    gap: 22px;
   }
 </style>
 
-<div class="row-block">
-  {% for seat in seats[:75] %}
-    <div class="seat {{ seat.status }}"
-         data-id="{{ seat.id }}"
-         data-number="{{ seat.number }}"
-         data-type="{{ seat.type }}"
-         data-price="{{ seat.price }}"
-         data-location="{{ seat.location }}">
-      <i class="fas fa-chair"></i>
-      {{ seat.number }}
-      <small>{{ seat.type }}</small>
-      <small>₹{{ seat.price }}</small>
+<div class="bus-container">
+  <div class="bus-header">💺 Luxury Library  Seat Layout</div>
+
+  <div class="bus-layout">
+    <!-- Left side -->
+    <div class="seat-group">
+      {% for seat in seats[:150] %}
+        <div class="seat {{ seat.status }}"
+             data-id="{{ seat.id }}"
+             data-number="{{ seat.number }}"
+             data-type="{{ seat.type }}"
+             data-price="{{ seat.price }}"
+             data-location="{{ seat.location }}">
+          <div class="icon">💺</div>
+          {{ seat.number }}
+          <small>{{ seat.type }}</small>
+          <small>₹{{ seat.price }}</small>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
 
-<div class="passage"></div>
+    <!-- Passage -->
+    <div class="passage"></div>
 
-<div class="row-block">
-  {% for seat in seats[75:150] %}
-    <div class="seat {{ seat.status }}"
-         data-id="{{ seat.id }}"
-         data-number="{{ seat.number }}"
-         data-type="{{ seat.type }}"
-         data-price="{{ seat.price }}"
-         data-location="{{ seat.location }}">
-      <i class="fas fa-chair"></i>
-      {{ seat.number }}
-      <small>{{ seat.type }}</small>
-      <small>₹{{ seat.price }}</small>
+    <!-- Right side -->
+    <div class="seat-group">
+      {% for seat in seats[150:300] %}
+        <div class="seat {{ seat.status }}"
+             data-id="{{ seat.id }}"
+             data-number="{{ seat.number }}"
+             data-type="{{ seat.type }}"
+             data-price="{{ seat.price }}"
+             data-location="{{ seat.location }}">
+          <div class="icon">💺</div>
+          {{ seat.number }}
+          <small>{{ seat.type }}</small>
+          <small>₹{{ seat.price }}</small>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
+  </div>
 
-<div class="row-block">
-  {% for seat in seats[150:225] %}
-    <div class="seat {{ seat.status }}"
-         data-id="{{ seat.id }}"
-         data-number="{{ seat.number }}"
-         data-type="{{ seat.type }}"
-         data-price="{{ seat.price }}"
-         data-location="{{ seat.location }}">
-      <i class="fas fa-chair"></i>
-      {{ seat.number }}
-      <small>{{ seat.type }}</small>
-      <small>₹{{ seat.price }}</small>
-    </div>
-  {% endfor %}
-</div>
-
-<div class="passage"></div>
-
-<div class="row-block">
-  {% for seat in seats[225:300] %}
-    <div class="seat {{ seat.status }}"
-         data-id="{{ seat.id }}"
-         data-number="{{ seat.number }}"
-         data-type="{{ seat.type }}"
-         data-price="{{ seat.price }}"
-         data-location="{{ seat.location }}">
-      <i class="fas fa-chair"></i>
-      {{ seat.number }}
-      <small>{{ seat.type }}</small>
-      <small>₹{{ seat.price }}</small>
-    </div>
-  {% endfor %}
+  <!-- Back Seat (extra row for 5 seats) -->
+  <div class="back-seat-row">
+    {% for seat in seats[300:305] %}
+      <div class="seat {{ seat.status }}">
+        <div class="icon">💺</div>
+        {{ seat.number }}
+        <small>{{ seat.type }}</small>
+        <small>₹{{ seat.price }}</small>
+      </div>
+    {% endfor %}
+  </div>
 </div>
