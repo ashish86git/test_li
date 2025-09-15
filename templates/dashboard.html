@@ -51,11 +51,21 @@
     canvas {
       max-height: 320px !important;
     }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
 <div class="container py-4">
-  <h4 class="mb-4">📊 Dashboard Summary</h4>
+  <div class="top-bar">
+    <h4>📊 Dashboard Summary</h4>
+    <!-- Home button -->
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-light btn-sm">🏠 Home</a>
+  </div>
 
   <!-- Cards -->
   <div class="dashboard-row">
