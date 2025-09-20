@@ -1,6 +1,6 @@
 <style>
   .bus-container {
-    background: linear-gradient(135deg, #fdfbfb, #ebedee);
+    background: linear-gradient(135deg, #e0f7fa, #d0eafc);
     padding: 35px;
     border-radius: 22px;
     box-shadow: 0 10px 28px rgba(0,0,0,0.12);
@@ -10,22 +10,22 @@
 
   .bus-header {
     text-align: center;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 700;
     margin-bottom: 28px;
-    color: #2c3e50;
+    color: #1565c0;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
   }
 
   .bus-layout {
     display: flex;
     justify-content: center;
-    gap: 70px; /* passage ka gap */
+    gap: 70px;
   }
 
   .seat-group {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 seats ek row me */
+    grid-template-columns: repeat(2, 1fr);
     gap: 22px 38px;
   }
 
@@ -45,18 +45,20 @@
     border: 2px solid #dee2e6;
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     transition: all 0.3s ease;
-  }
-
-  .seat:hover {
-    transform: translateY(-5px) scale(1.05);
-    border-color: #3498db;
-    box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+    position: relative;
   }
 
   .seat .icon {
     font-size: 36px;
     margin-bottom: 6px;
+    transition: transform 0.3s ease;
   }
+
+  /* Hover effects */
+  .seat.available:hover { animation: pulse 1.2s infinite; }
+  .seat.booked:hover { animation: shake 0.5s; cursor: not-allowed; }
+  .seat.blocked:hover { opacity: 0.7; cursor: not-allowed; }
+  .seat:hover .icon { transform: rotate(-15deg); }
 
   /* Seat Status Colors */
   .available {
@@ -66,12 +68,10 @@
   .booked {
     background: linear-gradient(145deg, #e74c3c, #c0392b);
     color: #fff;
-    cursor: not-allowed;
   }
   .blocked {
     background: linear-gradient(145deg, #95a5a6, #7f8c8d);
     color: #fff;
-    cursor: not-allowed;
   }
 
   /* Passage */
@@ -86,21 +86,44 @@
     justify-content: center;
     gap: 22px;
   }
+
+  /* Animations */
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+    50% { transform: scale(1.05); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+    100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
+  }
 </style>
 
 <div class="bus-container">
-  <div class="bus-header">💺 Luxury Library  Seat Layout</div>
+  <div class="bus-header">💺 Luxury Library Seat Layout</div>
+
+  {% set total_seats = seats|length %}
+  {% set back_count = 5 %}
+  {% set seats_per_side = (total_seats - back_count) // 2 %}
+  {% set left_seats = seats[:seats_per_side] %}
+  {% set right_seats = seats[seats_per_side:seats_per_side*2] %}
+  {% set back_seats = seats[-back_count:] %}
 
   <div class="bus-layout">
     <!-- Left side -->
     <div class="seat-group">
-      {% for seat in seats[:150] %}
+      {% for seat in left_seats %}
         <div class="seat {{ seat.status }}"
              data-id="{{ seat.id }}"
              data-number="{{ seat.number }}"
              data-type="{{ seat.type }}"
              data-price="{{ seat.price }}"
-             data-location="{{ seat.location }}">
+             data-location="{{ seat.location }}"
+             title="{% if seat.status == 'booked' %}Booked by: {{ seat.booked_by }}{% elif seat.status == 'blocked' %}Blocked until: {{ seat.blocked_until }}{% else %}Available{% endif %}">
           <div class="icon">💺</div>
           {{ seat.number }}
           <small>{{ seat.type }}</small>
@@ -114,13 +137,14 @@
 
     <!-- Right side -->
     <div class="seat-group">
-      {% for seat in seats[150:300] %}
+      {% for seat in right_seats %}
         <div class="seat {{ seat.status }}"
              data-id="{{ seat.id }}"
              data-number="{{ seat.number }}"
              data-type="{{ seat.type }}"
              data-price="{{ seat.price }}"
-             data-location="{{ seat.location }}">
+             data-location="{{ seat.location }}"
+             title="{% if seat.status == 'booked' %}Booked by: {{ seat.booked_by }}{% elif seat.status == 'blocked' %}Blocked until: {{ seat.blocked_until }}{% else %}Available{% endif %}">
           <div class="icon">💺</div>
           {{ seat.number }}
           <small>{{ seat.type }}</small>
@@ -130,10 +154,16 @@
     </div>
   </div>
 
-  <!-- Back Seat (extra row for 5 seats) -->
+  <!-- Back Seat Row -->
   <div class="back-seat-row">
-    {% for seat in seats[300:305] %}
-      <div class="seat {{ seat.status }}">
+    {% for seat in back_seats %}
+      <div class="seat {{ seat.status }}"
+           data-id="{{ seat.id }}"
+           data-number="{{ seat.number }}"
+           data-type="{{ seat.type }}"
+           data-price="{{ seat.price }}"
+           data-location="{{ seat.location }}"
+           title="{% if seat.status == 'booked' %}Booked by: {{ seat.booked_by }}{% elif seat.status == 'blocked' %}Blocked until: {{ seat.blocked_until }}{% else %}Available{% endif %}">
         <div class="icon">💺</div>
         {{ seat.number }}
         <small>{{ seat.type }}</small>
@@ -142,3 +172,15 @@
     {% endfor %}
   </div>
 </div>
+
+<script>
+  // Optional: Bootstrap tooltip init (if using bootstrap)
+  document.querySelectorAll('.seat').forEach(function(el){
+    el.addEventListener('mouseenter', function(){
+      const tooltipText = el.getAttribute('title');
+      el.setAttribute('data-bs-toggle','tooltip');
+      el.setAttribute('title', tooltipText);
+      new bootstrap.Tooltip(el);
+    });
+  });
+</script>

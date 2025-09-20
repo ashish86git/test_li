@@ -13,108 +13,43 @@
       min-height: 100vh;
       color: #f8f9fa;
     }
-    .navbar {
-      background: #12192c;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-    }
-    .navbar-brand {
-      font-weight: bold;
-      font-size: 1.2rem;
-      color: #f8f9fa !important;
-    }
+    .navbar { background: #12192c; box-shadow: 0 3px 8px rgba(0,0,0,0.4); }
+    .navbar-brand { font-weight: bold; font-size: 1.2rem; color: #f8f9fa !important; }
     .nav-link { color:#f8f9fa !important; }
     .nav-link:hover { color:#ffc107 !important; }
-
     h2, h4 { color: #f20c0c; font-weight: 600; }
     .card {
       border-radius: 15px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.35);
       margin-bottom: 2rem;
-      background: #ffffff;
-      color: #000;
+      background: #ffffff; color: #000;
     }
-    .hall {
-      display:flex; justify-content:center;
-      margin-top:20px; gap:50px; flex-wrap:wrap;
-    }
+    .hall { display:flex; justify-content:center; margin-top:20px; gap:50px; flex-wrap:wrap; }
     .row-block { display:flex; flex-direction:column; gap:10px; }
     .seat {
       width:55px; height:60px; border-radius:8px;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      font-size:11px; font-weight:bold; cursor:pointer;
-      padding:4px; text-align:center; transition:all 0.2s ease-in-out;
-      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      font-size:11px; font-weight:bold; cursor:pointer; padding:4px;
+      text-align:center; transition:all 0.2s ease-in-out; box-shadow:0 2px 6px rgba(0,0,0,0.2);
     }
     .seat:hover { transform: scale(1.07); }
     .available { background:#28a745; color:#fff; }
     .booked { background:#dc3545; color:#fff; }
     .blocked { background:#6c757d; color:#fff; }
-    .passage { width:60px; }
-    .legend span {
-      display:inline-block; width:20px; height:20px;
-      margin-right:5px; border-radius:4px;
-    }
+    .legend span { display:inline-block; width:20px; height:20px; margin-right:5px; border-radius:4px; }
     .table thead { background: #12192c; color: #fff; }
     .table tbody tr:hover { background: rgba(0,0,0,0.05); }
     .btn { border-radius: 8px; }
     .search-box { max-width: 300px; }
-
-    /* Modal styling */
-    .modal-content {
-      border-radius: 14px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-    }
-    .modal-header {
-      background: linear-gradient(90deg, #007bff, #00c6ff);
-      color: #fff;
-      border-top-left-radius: 14px;
-      border-top-right-radius: 14px;
-    }
+    .modal-content { border-radius: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+    .modal-header { background: linear-gradient(90deg, #007bff, #00c6ff); color: #fff; }
     .modal-title { font-weight: 600; }
-    .modal-body {
-      background: #f9fbfd;
-      padding: 20px;
-    }
-    .modal-footer {
-      background: #f1f4f8;
-      border-top: 1px solid #dee2e6;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
-    }
-    .form-control, .form-select {
-      border-radius: 8px;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .hall {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .seat {
-      width: 55px;
-      height: 60px;
-      font-size: 11px;
-    }
-
-    /* Tablet */
-    @media (max-width: 768px) {
-      .hall { gap: 8px; }
-      .seat { width: 45px; height: 50px; font-size: 10px; }
-    }
-
-    /* Mobile */
-    @media (max-width: 576px) {
-      .hall { gap: 6px; }
-      .seat { width: 40px; height: 45px; font-size: 9px; }
-    }
-
+    .form-control, .form-select { border-radius: 8px; }
   </style>
 </head>
 <body class="container-fluid p-0">
 
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg px-3 navbar-dark">
     <a class="navbar-brand" href="#">📊 Admin Dashboard</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -126,74 +61,22 @@
         <li class="nav-item"><a class="nav-link" href="#seats">💺 Seats</a></li>
         <li class="nav-item"><a class="nav-link" href="#bookings">📝 Bookings</a></li>
         <li class="nav-item"><a class="nav-link" href="#users">👥 Users</a></li>
-        <li class="nav-item"><a class="nav-link" href="#help">❓ Help</a></li>
+        <li class="nav-item"><a class="nav-link" href="#help" data-bs-toggle="modal" data-bs-target="#helpModal">❓ Help</a></li>
         <li class="nav-item"><a href="{{ url_for('logout') }}" class="btn btn-sm btn-danger ms-2 mt-1 mt-lg-0">Logout</a></li>
       </ul>
     </div>
   </nav>
 
-
-  <!-- Help Section -->
-  <div id="help" class="container mt-3">
-    <div class="alert alert-info shadow-sm rounded">
-      <h5 class="mb-2">❓ Need Help?</h5>
-      <p class="mb-0">
-        If you face any issue while using the dashboard, please contact admin support at
-        <a href="mailto:support@library.com">support@library.com</a>.
-      </p>
-    </div>
-  </div>
-
   <div class="container py-4">
 
-    <!-- Filters -->
-    <div class="card p-3">
-      <form method="get" class="row g-3 align-items-end">
-        <div class="col-md-4">
-          <label class="form-label fw-bold">Filter by Seat Type</label>
-          <select name="type" class="form-select">
-            <option value="">All</option>
-            {% for t in seat_types %}
-              <option value="{{ t }}" {% if filter_type == t %}selected{% endif %}>{{ t }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label class="form-label fw-bold">Filter by Location</label>
-          <select name="location" class="form-select">
-            <option value="">All</option>
-            {% for city, halls in grouped_locations.items() %}
-              <optgroup label="{{ city }}">
-                {% for hall in halls %}
-                  <option value="{{ hall }}" {% if filter_location == hall %}selected{% endif %}>{{ hall }}</option>
-                {% endfor %}
-              </optgroup>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-4 d-flex gap-2">
-          <button class="btn btn-primary flex-fill">Apply Filters</button>
-          {% if filter_type or filter_location %}
-            <a class="btn btn-outline-secondary flex-fill" href="{{ url_for('admin_dashboard') }}">Clear</a>
-          {% endif %}
-        </div>
-      </form>
-    </div>
-
-    <!-- Legend -->
-    <div class="legend mb-3 mt-3 text-center text-white">
-      <span class="available"></span> Available
-      <span class="booked"></span> Booked
-      <span class="blocked"></span> Blocked
-    </div>
-
-    <!-- Seat Layout -->
+    <!-- Seat Section -->
     <div id="seats" class="card p-3">
-      <h4 class="mb-3">💺 Seat Layout</h4>
-      <div class="hall">
-        {% include "seat_layout.html" %}
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-3">💺 Seat Layout</h4>
+        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addSeatModal">➕ Add Seat</button>
       </div>
-      <p class="text-muted mt-2 text-center">Click any seat to edit (type/price/location). Right-click for quick actions.</p>
+      <div class="hall">{% include "seat_layout.html" %}</div>
+      <p class="text-muted mt-2 text-center">Click seat to edit. Right-click for quick actions.</p>
     </div>
 
     <!-- Bookings Table -->
@@ -206,62 +89,49 @@
         <table id="bookingTable" class="table table-bordered table-hover align-middle">
           <thead>
             <tr>
-              <th>User</th>
-              <th>Seat</th>
-              <th>Type</th>
-              <th>Price</th>
-              <th>Location</th>
-              <th>Booked At</th>
-              <th>Valid Till</th>
-              <th>Aadhaar</th>
-              <th>Photo</th>
-              <th>ID Card</th>
+              <th>User</th><th>Seat</th><th>Type</th><th>Price</th>
+              <th>Location</th><th>Booked At</th><th>Valid Till</th>
+              <th>Aadhaar</th><th>Photo</th><th>ID Card</th>
             </tr>
           </thead>
           <tbody>
-          {% for b in bookings %}
-            {% set u = users|selectattr("id", "equalto", b.user_id)|first %}
-            {% set seat = seats|selectattr("id", "equalto", b.seat_id)|first %}
-            <tr>
-              <td>{{ u.name if u else "Unknown" }}</td>
-              <td>{{ b.seat_id }}</td>
-              <td>{{ seat.type if seat else "" }}</td>
-              <td>₹{{ b.amount }}</td>
-              <td>{{ seat.location if seat else "" }}</td>
-              <td>{{ b.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
-              <td>{{ b.valid_till.strftime("%Y-%m-%d") }}</td>
-              <td>
-                {% if b.aadhaar %}
-                  <a href="{{ url_for('static', filename='uploads/' ~ b.aadhaar) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
-                {% else %}
-                  <span class="text-muted">N/A</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if b.photo %}
-                  <img src="{{ url_for('static', filename='uploads/' ~ b.photo) }}" alt="Photo" width="40" height="40" class="rounded shadow-sm">
-                {% else %}
-                  <span class="text-muted">N/A</span>
-                {% endif %}
-              </td>
-              <td>
-                <button class="btn btn-sm btn-success" onclick="printIDCard(
-                  '{{ u.name if u else '' }}',
-                  '{{ b.seat_id }}',
-                  '{{ seat.type if seat else '' }}',
-                  '{{ b.valid_till.strftime('%Y-%m-%d') }}',
-                  '{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}',
-                  '{{ url_for('static', filename='uploads/' ~ b.photo) if b.photo else '' }}'
-                )">Print</button>
-              </td>
-            </tr>
-          {% endfor %}
+            {% for b in bookings %}
+              {% set u = users|selectattr("id", "equalto", b.user_id)|first %}
+              {% set seat = seats|selectattr("id", "equalto", b.seat_id)|first %}
+              <tr>
+                <td>{{ u.name if u else "Unknown" }}</td>
+                <td>{{ b.seat_id }}</td>
+                <td>{{ seat.type if seat else "" }}</td>
+                <td>₹{{ b.amount }}</td>
+                <td>{{ seat.location if seat else "" }}</td>
+                <td>{{ b.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                <td>{{ b.valid_till.strftime("%Y-%m-%d") }}</td>
+                <td>
+                  {% if b.aadhaar %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ b.aadhaar) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                  {% else %}<span class="text-muted">N/A</span>{% endif %}
+                </td>
+                <td>
+                  {% if b.photo_data %}
+                    <img src="{{ url_for('photo', bid=b.id) }}" class="img-thumbnail" width="80">
+                  {% else %}<span class="text-muted">No Photo</span>{% endif %}
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-success" onclick="printIDCard(
+                    '{{ u.name if u else '' }}',
+                    '{{ b.seat_id }}',
+                    '{{ seat.type if seat else '' }}',
+                    '{{ b.valid_till.strftime('%Y-%m-%d') }}',
+                    '{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}',
+                    '{{ url_for('photo', bid=b.id) if b.photo_data else '' }}'
+                  )">Print</button>
+                </td>
+              </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
-      <nav>
-        <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
-      </nav>
+      <nav><ul class="pagination justify-content-center mt-3" id="pagination"></ul></nav>
     </div>
 
     <!-- Users Table -->
@@ -269,213 +139,94 @@
       <h4 class="mb-3">👥 Users</h4>
       <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Mobile</th>
-              <th>Message</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Message</th></tr></thead>
           <tbody>
-          {% for u in users %}
-            <tr>
-              <td>{{ u.name }}</td>
-              <td>{{ u.email }}</td>
-              <td>{{ u.mobile }}</td>
-              <td>
-                <form method="post" action="{{ url_for('admin_message') }}" class="d-flex">
-                  <input type="hidden" name="user_id" value="{{ u.id }}">
-                  <input type="text" name="message" class="form-control form-control-sm" placeholder="Message">
-                  <button class="btn btn-sm btn-primary ms-1">Send</button>
-                </form>
-              </td>
-            </tr>
-          {% endfor %}
+            {% for u in users %}
+              <tr>
+                <td>{{ u.name }}</td><td>{{ u.email }}</td><td>{{ u.mobile }}</td>
+                <td>
+                  <form method="post" action="{{ url_for('admin_message') }}" class="d-flex">
+                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                    <input type="text" name="message" class="form-control form-control-sm" placeholder="Message">
+                    <button class="btn btn-sm btn-primary ms-1">Send</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
-  </div>
 
-  <!-- Help Modal -->
-  <div class="modal fade" id="helpModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-info text-white">
-          <h5 class="modal-title">❓ Help & Support</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p>
-            Welcome to the <b>Admin Dashboard</b>.<br>
-            👉 Use the navigation bar to manage <b>Seats</b>, <b>Bookings</b>, and <b>Users</b>.<br>
-            👉 Right-click on a seat for quick actions (block/unblock/unbook).<br>
-            👉 You can filter data using the filters provided above tables.
-          </p>
-          <hr>
-          <p class="mb-1">For any issue or queries, contact:</p>
-          <p class="fw-bold mb-0">📧 support@library.com</p>
-          <p class="fw-bold">📞 +91 98765 43210</p>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  </div> <!-- /container -->
 
-  <!-- Seat Update Modal -->
-  <div class="modal fade" id="seatModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="post" action="{{ url_for('admin_update_seat') }}">
-          <div class="modal-header">
-            <h5 class="modal-title">Update Seat</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <input type="hidden" name="seat_id" id="seatId">
-            <div class="mb-3">
-              <label class="form-label fw-bold">Type</label>
-              <select name="type" id="seatTypeModal" class="form-select">
-                {% for t in seat_types %}
-                  <option>{{ t }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold">Price</label>
-              <input type="number" name="price" id="seatPrice" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold">Location</label>
-              <select name="location" id="seatLocationModal" class="form-select">
-                {% for city, halls in grouped_locations.items() %}
-                  <optgroup label="{{ city }}">
-                    {% for hall in halls %}
-                      <option value="{{ hall }}">{{ hall }}</option>
-                    {% endfor %}
-                  </optgroup>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-primary">Save</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+  <!-- Modals -->
+  {% include "modals.html" %}
 
-<script>
-$(document).on("click", ".seat", function(e) {
-  const seatId = $(this).data("id");
-  const seatType = $(this).data("type");
-  const seatPrice = $(this).data("price");
-  const seatLocation = $(this).data("location");
-
-  $("#seatId").val(seatId);
-  $("#seatTypeModal").val(seatType);
-  $("#seatPrice").val(seatPrice);
-  $("#seatLocationModal").val(seatLocation);
-  $("#seatModal").modal("show");
-});
-
-$(document).on("contextmenu", ".seat", function(e) {
-  e.preventDefault();
-  const seatId = $(this).data("id");
-  const action = prompt("Enter action: block / unblock / unbook");
-  if (!action) return;
-
-  $.ajax({
-    url: "/admin_action",
-    type: "POST",
-    contentType: "application/json",
-    data: JSON.stringify({ seat_id: seatId, action: action }),
-    success: function(res) {
-      if (res.success) location.reload();
-      else alert("Action failed");
+  <script>
+    // Search + Pagination
+    const rowsPerPage = 5; let currentPage = 1;
+    function renderTable() {
+      const rows = $("#bookingTable tbody tr");
+      const search = $("#bookingSearch").val().toLowerCase();
+      rows.each(function(){ $(this).toggle($(this).text().toLowerCase().includes(search)); });
+      const visibleRows = rows.filter(":visible");
+      const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
+      visibleRows.hide().slice((currentPage-1)*rowsPerPage, currentPage*rowsPerPage).show();
+      const pagination = $("#pagination"); pagination.empty();
+      for (let i=1; i<=totalPages; i++)
+        pagination.append(`<li class="page-item ${i===currentPage?'active':''}"><a class="page-link" href="#">${i}</a></li>`);
     }
-  });
-});
+    $("#bookingSearch").on("keyup", ()=>{currentPage=1; renderTable();});
+    $(document).on("click","#pagination .page-link",function(e){e.preventDefault(); currentPage=parseInt($(this).text()); renderTable();});
+    $(document).ready(renderTable);
 
-// Search + Pagination for bookings
-const rowsPerPage = 5;
-let currentPage = 1;
+    // Seat click
+    $(document).on("click",".seat",function(){
+      $("#seatId").val($(this).data("id"));
+      $("#seatTypeModal").val($(this).data("type"));
+      $("#seatPrice").val($(this).data("price"));
+      $("#seatLocationModal").val($(this).data("location"));
+      $("#seatModal").modal("show");
+    });
 
-function renderTable() {
-  const rows = $("#bookingTable tbody tr");
-  const search = $("#bookingSearch").val().toLowerCase();
+    // Seat right-click
+    $(document).on("contextmenu",".seat",function(e){
+      e.preventDefault();
+      const seatId=$(this).data("id");
+      const action=prompt("Enter action: block / unblock / unbook");
+      if(!action) return;
+      $.ajax({
+        url:"/admin_action",type:"POST",contentType:"application/json",
+        data:JSON.stringify({seat_id:seatId,action:action}),
+        success:function(res){if(res.success) location.reload(); else alert("Action failed");}
+      });
+    });
 
-  rows.each(function() {
-    const text = $(this).text().toLowerCase();
-    $(this).toggle(text.includes(search));
-  });
-
-  const visibleRows = rows.filter(":visible");
-  const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
-
-  visibleRows.hide();
-  visibleRows.slice((currentPage-1)*rowsPerPage, currentPage*rowsPerPage).show();
-
-  const pagination = $("#pagination");
-  pagination.empty();
-  for (let i=1; i<=totalPages; i++) {
-    pagination.append(`<li class="page-item ${i===currentPage ? 'active':''}">
-      <a class="page-link" href="#">${i}</a></li>`);
-  }
-}
-
-$("#bookingSearch").on("keyup", function(){ currentPage=1; renderTable(); });
-$(document).on("click", "#pagination .page-link", function(e){
-  e.preventDefault();
-  currentPage = parseInt($(this).text());
-  renderTable();
-});
-$(document).ready(renderTable);
-
-function printIDCard(name, seatId, seatType, validTill, bookedAt, photoUrl) {
-  const cardWindow = window.open("", "_blank", "width=400,height=500");
-  cardWindow.document.write(`
-    <html>
-    <head>
-      <title>ID Card</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin:0; padding:20px; text-align:center; }
-        .id-card {
-          border:2px solid #000; border-radius:10px; width:320px; padding:15px; margin:auto;
-          box-shadow:0 0 6px rgba(0,0,0,0.3); position:relative;
-          background: url('${window.location.origin}/static/uploads/company_logo.jpeg') no-repeat center center;
-          background-size: contain;
-        }
-        .overlay { background: rgba(255,255,255,0.9); padding:10px; border-radius:10px; }
-        .id-card h3 { margin:0 0 10px; background:#343a40; color:#fff; padding:6px; border-radius:6px; }
-        .id-card img { width:80px; height:80px; border-radius:6px; margin:10px auto; display:block; border:1px solid #ccc; }
-        .id-card p { margin:5px 0; font-size:14px; font-weight:bold; }
-        .footer { font-size:12px; color:#555; margin-top:10px; }
-      </style>
-    </head>
-    <body>
-      <div class="id-card">
-        <div class="overlay">
+    // ID Card Print
+    function printIDCard(name,seatId,seatType,validTill,bookedAt,photoUrl){
+      const w=window.open("","_blank","width=400,height=500");
+      w.document.write(`
+        <html><head><title>ID Card</title>
+        <style>
+          body{font-family:Arial,sans-serif;text-align:center;}
+          .id-card{border:2px solid #000;border-radius:10px;width:320px;padding:15px;margin:auto;box-shadow:0 0 6px rgba(0,0,0,0.3);}
+          .id-card h3{background:#343a40;color:#fff;padding:6px;border-radius:6px;}
+          .id-card img{width:80px;height:80px;border-radius:6px;margin:10px auto;display:block;}
+          .footer{font-size:12px;color:#555;margin-top:10px;}
+        </style></head>
+        <body><div class="id-card">
           <h3>🎟 Signature Library Pass</h3>
-          ${photoUrl ? `<img src="${photoUrl}" alt="Photo">` : `<div style="width:80px;height:80px;border:1px dashed #999;margin:10px auto;"></div>`}
+          ${photoUrl?`<img src="${photoUrl}">`:`<div style="width:80px;height:80px;border:1px dashed #999;margin:10px auto;"></div>`}
           <p><b>Name:</b> ${name}</p>
           <p><b>Seat:</b> ${seatId} (${seatType})</p>
           <p><b>Booked At:</b> ${bookedAt}</p>
           <p><b>Valid Till:</b> ${validTill}</p>
           <div class="footer">System Generated | Valid for entry only</div>
-        </div>
-      </div>
-      <script>window.print();<\/script>
-    </body>
-    </html>
-  `);
-  cardWindow.document.close();
-}
-</script>
+        </div><script>window.print();<\/script></body></html>`);
+      w.document.close();
+    }
+  </script>
 
 </body>
 </html>

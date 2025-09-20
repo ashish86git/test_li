@@ -1,42 +1,141 @@
 {% extends "base.html" %}
 {% block title %}Invoice{% endblock %}
 {% block content %}
-<div class="card shadow-lg">
-  <div class="card-header bg-dark text-white">
-    🎟 Seat Booking Receipt
-  </div>
-  <div class="card-body">
-    <div class="row">
-      <!-- Left side details -->
-      <div class="col-md-8">
-        <p><b>Name:</b> {{ user.name }}</p>
+
+<style>
+  .invoice-container {
+    background: #fff;
+    border: 2px solid #ddd;
+    padding: 25px;
+    margin-bottom: 40px;
+    border-radius: 12px;
+    font-family: "Segoe UI", sans-serif;
+  }
+  .invoice-header {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+  }
+  .invoice-header img { max-height: 70px; margin-bottom: 8px; }
+  .invoice-header h2 { margin: 0; font-weight: bold; color: #222; }
+  .invoice-header p { margin: 0; font-size: 14px; color: #555; }
+  .invoice-copy-label {
+    text-align: right;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .invoice-details p, .invoice-details li { font-size: 15px; margin: 4px 0; }
+  .invoice-breakup { margin-top: 10px; font-size: 14px; }
+  .invoice-breakup table { width: 100%; border-collapse: collapse; margin-top:5px;}
+  .invoice-breakup th, .invoice-breakup td { border:1px solid #ccc; padding:5px; text-align:left; }
+  .invoice-breakup th { background:#f2f2f2; }
+  .signature-box { margin-top: 25px; text-align: right; }
+  .signature-line { margin-top: 40px; border-top: 1px solid #000; display: inline-block; padding-top: 5px; font-size: 14px; color: #444; }
+  .photo-qr { text-align: center; }
+</style>
+
+<div class="container">
+
+  {% for copy in ['OFFICE COPY', 'STUDENT COPY'] %}
+  <div class="invoice-container shadow-lg">
+    <div class="invoice-copy-label">{{ copy }}</div>
+    <div class="invoice-header">
+      <img src="{{ url_for('static', filename='images/company_logo.png') }}" alt="Logo">
+      <h2>🎟 Seat Booking Receipt</h2>
+      <p><b>Signature Library</b></p>
+      <p>100 Feet Rd, near Agrawal sweet, Block B, Sant Nagar, Burari, Delhi, 110084</p>
+      <p>Phone: +91 99909 91630 | Email: info@mycoaching.com</p>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-8 invoice-details">
+        <p><b>Student Name:</b> {{ user.name }}</p>
         <p><b>Seat:</b> {{ seat.id }} ({{ seat.type }})</p>
-        <p><b>Amount Paid:</b> ₹{{ booking.amount }}</p>
-        <p><b>Valid Till:</b> {{ booking.valid_till.strftime("%Y-%m-%d") }}</p>
+        <p><b>Location:</b> {{ seat.location }}</p>
         <p><b>Booking Date:</b> {{ booking.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
+        <p><b>Valid Till:</b> {{ booking.valid_till.strftime("%Y-%m-%d") }}</p>
+
+        {# -------- Amount Calculation & Breakup -------- #}
+        {% set total_days = (booking.valid_till - booking.created_at).days %}
+        {% if total_days <= 30 %}
+            {% set total_amount = seat.price * 0.75 %}
+            {% set full_months = 0 %}
+            {% set extra_days = total_days %}
+            {% set full_month_amount = 0 %}
+            {% set partial_amount = total_amount %}
+        {% else %}
+            {% set full_months = total_days // 30 %}
+            {% set extra_days = total_days % 30 %}
+            {% set full_month_amount = full_months * seat.price %}
+            {% if extra_days >= 15 %}
+                {% set partial_amount = seat.price * 0.75 %}
+            {% else %}
+                {% set partial_amount = seat.price * 0.5 %}
+            {% endif %}
+            {% set total_amount = full_month_amount + partial_amount %}
+        {% endif %}
+
+
+        <div class="invoice-breakup">
+          <b>Amount Breakup:</b>
+          <table>
+            <tr><th>Description</th><th>Days</th><th>Rate (₹)</th><th>Amount (₹)</th></tr>
+            {% if full_months > 0 %}
+            <tr>
+              <td>Full Month(s)</td>
+              <td>{{ full_months*30 }}</td>
+              <td>{{ seat.price }}</td>
+              <td>{{ "%.2f"|format(full_month_amount) }}</td>
+            </tr>
+            {% endif %}
+            {% if extra_days > 0 %}
+            <tr>
+              <td>Partial Month</td>
+              <td>{{ extra_days }}</td>
+              <td>{{ seat.price }} × {% if extra_days>=15 %}0.75{% else %}0.5{% endif %}</td>
+              <td>{{ "%.2f"|format(partial_amount) }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <th colspan="3">Total</th>
+              <th>₹{{ "%.2f"|format(total_amount) }}</th>
+            </tr>
+          </table>
+        </div>
+
       </div>
 
-      <!-- Photo column -->
-      <div class="col-md-2 text-center">
+      <div class="col-md-2 photo-qr">
         {% if booking.photo_data %}
-          <img src="{{ url_for('photo', bid=booking.id) }}"
-               alt="User Photo" class="img-thumbnail" width="120">
+          <img src="{{ url_for('photo', bid=booking.id) }}" alt="User Photo" class="img-thumbnail" width="100">
           <p class="mt-2"><small>Passport Photo</small></p>
         {% else %}
-          <p class="text-muted">No Photo Uploaded</p>
+          <p class="text-muted">No Photo</p>
         {% endif %}
       </div>
 
-      <!-- QR code column -->
-      <div class="col-md-2 text-center">
+      <div class="col-md-2 photo-qr">
         <img src="{{ url_for('static', filename='qrcodes/' ~ booking.id ~ '.png') }}"
-             alt="QR Code" class="img-thumbnail" width="120">
+             alt="QR Code" class="img-thumbnail" width="100">
         <p class="mt-2"><small>QR Code</small></p>
       </div>
     </div>
+
+    {% if copy == 'STUDENT COPY' %}
+    <div class="signature-box">
+      <span class="signature-line">Authorized Signature</span>
+    </div>
+    {% endif %}
+
+  </div>
+  {% endfor %}
+
+  <div class="text-center">
+    <button class="btn btn-primary mt-3" onclick="window.print()">🖨 Print Both Copies</button>
   </div>
 </div>
 
-<!-- Print button -->
-<button class="btn btn-primary mt-3" onclick="window.print()">🖨 Print</button>
 {% endblock %}

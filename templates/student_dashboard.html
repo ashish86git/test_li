@@ -259,6 +259,51 @@
     });
   });
 </script>
+<script>
+  // Seat select modal logic (same as before)
+  $(document).on("click", ".seat.available", function() {
+    $("#seat_id").val($(this).data("id"));
+    $("#seat_number").val($(this).data("number"));
+    $("#seat_type").val($(this).data("type"));
+    $("#seat_price").val($(this).data("price"));
+    $("#seat_location").val($(this).data("location"));
+    $("#bookingModal").modal("show");
+  });
+
+  // Booking submit
+  $("#bookingForm").on("submit", function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    $.ajax({
+      url: "/book",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(res) {
+        if (res.success) {
+          alert("Seat booked successfully!");
+        } else {
+          alert(res.message || "Booking failed");
+        }
+      }
+    });
+  });
+
+  // 🔹 Auto Refresh Seats & Bookings every 5 sec
+  function refreshData() {
+    $.get(window.location.href, function(data) {
+      // extract updated hall and bookings table from response
+      var newHall = $(data).find(".hall").html();
+      var newBookings = $(data).find("table tbody").html();
+
+      $(".hall").html(newHall);
+      $("table tbody").html(newBookings);
+    });
+  }
+
+  setInterval(refreshData, 5000); // refresh every 5 sec
+</script>
 
 </body>
 </html>
