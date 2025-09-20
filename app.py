@@ -49,6 +49,7 @@ class User(db.Model):
     messages = db.relationship("Message", backref="user", cascade="all, delete-orphan")
     bookings = db.relationship("Booking", backref="user", cascade="all, delete-orphan")
 
+
 class Message(db.Model):
     __tablename__ = "messages"
     id = db.Column(db.String, primary_key=True)
@@ -56,16 +57,21 @@ class Message(db.Model):
     text = db.Column(db.Text, nullable=False)
     time = db.Column(db.DateTime, nullable=False)
 
+
 class Seat(db.Model):
     __tablename__ = "seats"
     id = db.Column(db.String(36), primary_key=True)
     number = db.Column(db.Integer, nullable=False)
     type = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Integer, nullable=False)
-    location = db.Column(db.String(50), nullable=False)
+
+    # 🔹 yahan size badhakar 200 kar diya (pura location store karne ke liye)
+    location = db.Column(db.String(200), nullable=False)
+
     status = db.Column(db.String(20), nullable=False)  # available, booked, blocked
 
     bookings = db.relationship("Booking", backref="seat", cascade="all, delete-orphan")
+
 
 class Booking(db.Model):
     __tablename__ = "bookings"
@@ -75,6 +81,8 @@ class Booking(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     valid_till = db.Column(db.DateTime, nullable=False)
+
+    # customer details
     name = db.Column(db.String(100), nullable=False)
     contact = db.Column(db.String(50))
     email = db.Column(db.String(150))
@@ -119,20 +127,45 @@ def get_grouped_locations():
 # -------------------- Seat Initialization --------------------
 def init_seats():
     if Seat.query.count() == 0:
-        random.seed(3)
-        for i in range(1, 301):
-            seat_type = random.choice(TYPES)
-            location = random.choice(LOCATIONS)
-            seat = Seat(
-                id=f"S{i}",
-                number=i,
-                type=seat_type,
-                price=PRICE_MAP[seat_type],
-                location=location,
-                status="available"
-            )
-            db.session.add(seat)
+        # ✅ Manual Config (Admin decide karega yahan values)
+        seat_config = {
+            "Wazirabad": {
+                "Hall-A": [
+                    {"type": "Deluxe", "count": 10, "price": 1800},
+                    {"type": "Premium", "count": 15, "price": 1700}
+                ],
+                "Hall-B": [
+                    {"type": "Unreserved", "count": 20, "price": 1200}
+                ]
+            },
+            "Sant Kabir Nagar": {
+                "First-Floor": [
+                    {"type": "12Hrs-Day", "count": 12, "price": 1500}
+                ],
+                "Second-Floor": [
+                    {"type": "12Hrs-Night", "count": 10, "price": 800}
+                ]
+            }
+        }
+
+        seat_no = 1
+        for city, halls in seat_config.items():
+            for hall, configs in halls.items():
+                for cfg in configs:
+                    for _ in range(cfg["count"]):
+                        seat = Seat(
+                            id=f"S{seat_no}",
+                            number=seat_no,
+                            type=cfg["type"],
+                            price=cfg["price"],
+                            location=hall,
+                            status="available"
+                        )
+                        db.session.add(seat)
+                        seat_no += 1
+
         db.session.commit()
+
 
 # -------------------- Routes --------------------
 @app.route("/")
@@ -251,9 +284,6 @@ def profile():
     return render_template("profile.html", user=user)
 
 
-
-
-
 @app.route("/book", methods=["POST"])
 def book():
     user = current_user()
@@ -367,7 +397,7 @@ def admin_dashboard():
     return render_template(
         "admin_dashboard.html",
         seats=filtered_seats,
-        bookings=Booking.query.all(),
+        bookings=Booking.query.all(),   # same as before
         users=User.query.all(),
         seat_types=get_seat_types(),
         locations=get_locations(),
@@ -499,9 +529,32 @@ def dashboard():
         total_seats=total_seats,
         labels=labels,
         payments_by_day=payments_by_day,
-        bookings_by_day=bookings_by_day
+        bookings_by_day=bookings_by_day,
+
     )
 
+@app.route("/admin_add_seat", methods=["POST"])
+def admin_add_seat():
+    type_ = request.form["type"]
+    price = int(request.form["price"])
+    location = request.form["location"]
+    count = int(request.form["count"])
+
+    # last seat number find karo
+    last_number = db.session.query(db.func.max(Seat.number)).scalar() or 0
+    for i in range(1, count+1):
+        new_number = last_number + i
+        seat = Seat(
+            id=f"S{new_number}",
+            number=new_number,
+            type=type_,
+            price=price,
+            location=location,
+            status="available"
+        )
+        db.session.add(seat)
+    db.session.commit()
+    return redirect(url_for("admin_dashboard"))
 
 
 # ---------- Run ----------
@@ -509,4 +562,4 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         init_seats()
-    app.run(debug=True)
+        app.run(debug=True)
